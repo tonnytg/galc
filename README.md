@@ -2,8 +2,6 @@
 Google Cloud ACL Backup
 DOC: https://cloud.google.com/storage/docs/access-control/lists
 
-
-
 Permission:
 - READER
 - WRITER
@@ -20,4 +18,6 @@ Maximum:
 - 100 ACL each object
 
 
-
+Functions:
+- [x] Get Roles of projects
+- [ ] GetACLs

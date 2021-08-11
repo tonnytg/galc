@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,9 +12,22 @@ import (
 )
 
 func main() {
-	//GetRoles()
-	//GetServiceAccount()
-	GetServiceAccounts()
+
+	menu := "choose:\n\t--type Roles\n\t--type ServiceAccount\n\t--type ServiceAccounts\n"
+
+	f := flag.String("type", "", menu)
+	flag.Parse()
+
+	switch *f {
+	case "Roles":
+		GetRoles()
+	case "ServiceAccount":
+		GetServiceAccount()
+	case "ServiceAccounts":
+		GetServiceAccounts()
+	default:
+		fmt.Printf(menu)
+	}
 }
 
 type Roles struct {

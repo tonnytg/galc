@@ -12,6 +12,7 @@ import (
 
 func main() {
 	GetRoles()
+	GetServiceAccount()
 }
 
 type Roles struct {
@@ -23,6 +24,17 @@ type Roles struct {
 	} `json:"roles"`
 }
 
+type ServiceAccount struct {
+	Name           string `json:"name"`
+	ProjectID      string `json:"projectId"`
+	UniqueID       string `json:"uniqueId"`
+	Email          string `json:"email"`
+	DisplayName    string `json:"displayName"`
+	Etag           string `json:"etag"`
+	Description    string `json:"description"`
+	Oauth2ClientID string `json:"oauth2ClientId"`
+	Disabled       string `json:"disabled"`
+}
 
 // GetRoles POST and return JSON with all roles of project, need export GCP_API_KEY and PROJECT_ID to work
 // GCP_API_KEY you can obtain with "gcloud auth print-access-token"
@@ -52,15 +64,57 @@ func GetRoles() {
 		log.Println("Error on response.\n[ERRO] -", err)
 	} else {
 		defer resp.Body.Close()
-		var roles Roles
+		var role Roles
 		data, _ := ioutil.ReadAll(resp.Body)
-		json.Unmarshal(data, &roles)
+		json.Unmarshal(data, &role)
+		fmt.Println("Roles:")
 
-		for i := 0; i < 2; i++{
-			fmt.Println("Path:", roles.Role[i].Name)
-			fmt.Println("Name:", roles.Role[i].Title)
-			fmt.Println("Description:", roles.Role[i].Description)
+		for i := 0; i < len(role.Role); i++{
+			fmt.Printf("Path:\t\t %s \n", role.Role[i].Name)
+			fmt.Printf("Name:\t\t %s \n", role.Role[i].Title)
+			fmt.Printf("Description:\t %s \n", role.Role[i].Description)
 			fmt.Println("---")
 		}
+	}
+}
+
+// GetServiceAccount get info about one service account, you need export vars GCP_API_KEY PROJECT_ID and SERVICE_ACCOUNT
+func GetServiceAccount() {
+	token := os.Getenv("GCP_API_KEY")
+	project := os.Getenv("PROJECT_ID")
+	serviceAccount := os.Getenv("SERVICE_ACCOUNT")
+	url := fmt.Sprintf("https://iam.googleapis.com/v1/projects/%s/serviceAccounts/%s", project, serviceAccount)
+
+	bearer := "Bearer " + token
+
+	req, err := http.NewRequest("GET", url, bytes.NewBuffer(nil))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Add("Accept", "application/json")
+
+	client := &http.Client{}
+
+
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		for key, val := range via[0].Header {
+			req.Header[key] = val
+		}
+		return err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error on response.\n[ERRO] -", err)
+	} else {
+		defer resp.Body.Close()
+		var sc ServiceAccount
+		data, _ := ioutil.ReadAll(resp.Body)
+
+		json.Unmarshal(data, &sc)
+
+		fmt.Println("ServiceAccount:")
+		fmt.Printf("Project:\t %s \n", sc.ProjectID)
+		fmt.Printf("DisplayName:\t %s \n", sc.DisplayName)
+		fmt.Printf("Email:\t\t %s \n", sc.Email)
+		fmt.Printf("Description:\t\t %s \n", sc.Description)
+		fmt.Println("---")
 	}
 }

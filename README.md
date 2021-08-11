@@ -4,18 +4,16 @@
 
 ```go build```
 
-2. Export vars `GCP_API_KEY` and `PROJECT_ID`
+2. Export var `GCP_API_KEY`
 
 ```export GCP_API_KEY=$(gcloud auth print-access-token)```
 
-```export PROJECT_ID="project-id"```
-
 # How to use
-```./galc --type Role```
+```./galc --type Role --project PROJECT_ID```
 
-```./galc --type ServiceAccount EMAIL``` 
+```./galc --type ServiceAccount --email EMAIL --project PROJECT_ID``` 
 
-```./galc --type ServiceAccounts```
+```./galc --type ServiceAccounts --project PROJECT_ID```
 
 
 <br/>

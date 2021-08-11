@@ -13,7 +13,7 @@ import (
 
 func main() {
 
-	menu := "choose:\n\t--type Roles\n\t--type ServiceAccount\n\t--type ServiceAccounts\n"
+	menu := "choose:\n\t--type Roles\n\t--type ServiceAccount EMAIL\n\t--type ServiceAccounts\n"
 
 	f := flag.String("type", "", menu)
 	flag.Parse()
@@ -22,7 +22,7 @@ func main() {
 	case "Roles":
 		GetRoles()
 	case "ServiceAccount":
-		GetServiceAccount()
+		GetServiceAccount(os.Args[3])
 	case "ServiceAccounts":
 		GetServiceAccounts()
 	default:
@@ -80,7 +80,6 @@ func GetRoles() {
 
 	client := &http.Client{}
 
-
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		for key, val := range via[0].Header {
 			req.Header[key] = val
@@ -97,7 +96,7 @@ func GetRoles() {
 		json.Unmarshal(data, &role)
 		fmt.Println("Roles:")
 
-		for i := 0; i < len(role.Role); i++{
+		for i := 0; i < len(role.Role); i++ {
 			fmt.Printf("Path:\t\t %s \n", role.Role[i].Name)
 			fmt.Printf("Name:\t\t %s \n", role.Role[i].Title)
 			fmt.Printf("Description:\t %s \n", role.Role[i].Description)
@@ -107,12 +106,11 @@ func GetRoles() {
 }
 
 // GetServiceAccount get info about one service account, you need export vars GCP_API_KEY PROJECT_ID and SERVICE_ACCOUNT
-func GetServiceAccount() {
+func GetServiceAccount(serviceAccount string) {
 	token := os.Getenv("GCP_API_KEY")
 	project := os.Getenv("PROJECT_ID")
-	serviceAccount := os.Getenv("SERVICE_ACCOUNT")
 	url := fmt.Sprintf("https://iam.googleapis.com/v1/projects/%s/serviceAccounts/%s", project, serviceAccount)
-
+	fmt.Println("Looking for:", url)
 	bearer := "Bearer " + token
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer(nil))
@@ -120,7 +118,6 @@ func GetServiceAccount() {
 	req.Header.Add("Accept", "application/json")
 
 	client := &http.Client{}
-
 
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		for key, val := range via[0].Header {
@@ -159,7 +156,6 @@ func GetServiceAccounts() {
 	req.Header.Add("Accept", "application/json")
 
 	client := &http.Client{}
-
 
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		for key, val := range via[0].Header {

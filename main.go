@@ -11,8 +11,9 @@ import (
 )
 
 func main() {
-	GetRoles()
-	GetServiceAccount()
+	//GetRoles()
+	//GetServiceAccount()
+	GetServiceAccounts()
 }
 
 type Roles struct {
@@ -34,6 +35,19 @@ type ServiceAccount struct {
 	Description    string `json:"description"`
 	Oauth2ClientID string `json:"oauth2ClientId"`
 	Disabled       string `json:"disabled"`
+}
+
+type ServiceAccounts struct {
+	Accounts []struct {
+		Name           string `json:"name"`
+		ProjectID      string `json:"projectId"`
+		UniqueID       string `json:"uniqueId"`
+		Email          string `json:"email"`
+		DisplayName    string `json:"displayName"`
+		Etag           string `json:"etag"`
+		Oauth2ClientID string `json:"oauth2ClientId"`
+		Description    string `json:"description,omitempty"`
+	} `json:"accounts"`
 }
 
 // GetRoles POST and return JSON with all roles of project, need export GCP_API_KEY and PROJECT_ID to work
@@ -116,5 +130,46 @@ func GetServiceAccount() {
 		fmt.Printf("Email:\t\t %s \n", sc.Email)
 		fmt.Printf("Description:\t\t %s \n", sc.Description)
 		fmt.Println("---")
+	}
+}
+
+func GetServiceAccounts() {
+	token := os.Getenv("GCP_API_KEY")
+	project := os.Getenv("PROJECT_ID")
+	url := fmt.Sprintf("https://iam.googleapis.com/v1/projects/%s/serviceAccounts", project)
+
+	bearer := "Bearer " + token
+
+	req, err := http.NewRequest("GET", url, bytes.NewBuffer(nil))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Add("Accept", "application/json")
+
+	client := &http.Client{}
+
+
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		for key, val := range via[0].Header {
+			req.Header[key] = val
+		}
+		return err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Error on response.\n[ERRO] -", err)
+	} else {
+		defer resp.Body.Close()
+		data, _ := ioutil.ReadAll(resp.Body)
+		var scs ServiceAccounts
+		json.Unmarshal(data, &scs)
+
+		fmt.Println("ServiceAccounts:")
+		for i := 0; i < len(scs.Accounts); i++ {
+			fmt.Printf("Project:\t %s \n", scs.Accounts[i].ProjectID)
+			fmt.Printf("DisplayName:\t %s \n", scs.Accounts[i].DisplayName)
+			fmt.Printf("Email:\t\t %s \n", scs.Accounts[i].Email)
+			fmt.Printf("Description:\t %s \n", scs.Accounts[i].Description)
+			fmt.Println("---")
+		}
+
 	}
 }

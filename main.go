@@ -19,8 +19,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	menu := "choose:\n\t--type Roles\t\t\t --project PROJECT_ID\n\t--type ServiceAccount EMAIL\t --project PROJECT_ID\n\t" +
-		"--type ServiceAccounts\t\t --project PROJECT_ID\n"
+	menu := `
+Example: --type ServiceAccount --email teste-993@eng-venture-320213.iam.gserviceaccount.com --project eng-venture-320213
+
+--type Roles		--project PROJECT_ID
+--type ServiceAccount	--email name@domain.com
+--type ServiceAccounts	--project PROJECT_ID
+`
 
 	f := flag.String("type", "", menu)
 	p := flag.String("project", "", menu)
@@ -35,11 +40,11 @@ func main() {
 
 	switch {
 	case *f == "Roles":
-		GetRoles()
+		GetRoles(key, *p)
 	case *f == "ServiceAccount":
-		GetServiceAccount(os.Args[3])
+		GetServiceAccount(key, *e, *p)
 	case *f == "ServiceAccounts":
-		GetServiceAccounts()
+		GetServiceAccounts(key, *p)
 	default:
 		fmt.Printf(menu)
 	}
@@ -81,13 +86,11 @@ type ServiceAccounts struct {
 
 // GetRoles POST and return JSON with all roles of project, need export GCP_API_KEY and PROJECT_ID to work
 // GCP_API_KEY you can obtain with "gcloud auth print-access-token"
-func GetRoles() {
+func GetRoles(key string, project string) {
 
-	token := os.Getenv("GCP_API_KEY")
-	project := os.Getenv("PROJECT_ID")
 	url := fmt.Sprintf("https://iam.googleapis.com/v1/projects/%s/roles", project)
 
-	bearer := "Bearer " + token
+	bearer := "Bearer " + key
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer(nil))
 	req.Header.Set("Authorization", bearer)
@@ -121,12 +124,14 @@ func GetRoles() {
 }
 
 // GetServiceAccount get info about one service account, you need export vars GCP_API_KEY PROJECT_ID and SERVICE_ACCOUNT
-func GetServiceAccount(serviceAccount string) {
-	token := os.Getenv("GCP_API_KEY")
-	project := os.Getenv("PROJECT_ID")
+func GetServiceAccount(key, serviceAccount, project string) {
+	if serviceAccount == "" {
+		fmt.Println("empty --email and ServiceAccount need this argument")
+		os.Exit(1)
+	}
+
 	url := fmt.Sprintf("https://iam.googleapis.com/v1/projects/%s/serviceAccounts/%s", project, serviceAccount)
-	fmt.Println("Looking for:", url)
-	bearer := "Bearer " + token
+	bearer := "Bearer " + key
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer(nil))
 	req.Header.Set("Authorization", bearer)
@@ -150,7 +155,6 @@ func GetServiceAccount(serviceAccount string) {
 
 		json.Unmarshal(data, &sc)
 
-		fmt.Println("ServiceAccount:")
 		fmt.Printf("Project:\t %s \n", sc.ProjectID)
 		fmt.Printf("DisplayName:\t %s \n", sc.DisplayName)
 		fmt.Printf("Email:\t\t %s \n", sc.Email)
@@ -159,12 +163,12 @@ func GetServiceAccount(serviceAccount string) {
 	}
 }
 
-func GetServiceAccounts() {
-	token := os.Getenv("GCP_API_KEY")
-	project := os.Getenv("PROJECT_ID")
+func GetServiceAccounts(key, project string) {
+
+
 	url := fmt.Sprintf("https://iam.googleapis.com/v1/projects/%s/serviceAccounts", project)
 
-	bearer := "Bearer " + token
+	bearer := "Bearer " + key
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer(nil))
 	req.Header.Set("Authorization", bearer)
@@ -187,7 +191,6 @@ func GetServiceAccounts() {
 		var scs ServiceAccounts
 		json.Unmarshal(data, &scs)
 
-		fmt.Println("ServiceAccounts:")
 		for i := 0; i < len(scs.Accounts); i++ {
 			fmt.Printf("Project:\t %s \n", scs.Accounts[i].ProjectID)
 			fmt.Printf("DisplayName:\t %s \n", scs.Accounts[i].DisplayName)

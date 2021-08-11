@@ -1,23 +1,21 @@
-# [WIP] galc
-Google Cloud ACL Backup
-DOC: https://cloud.google.com/storage/docs/access-control/lists
+# galc - Google Accounts List Control
 
-Permission:
-- READER
-- WRITER
-- OWNER
+1. Build binary:
 
-Scope:
-- Email
-- Groups (work-group@googlegroups.com)
-- allUsers -> Fora da organização
-- allAuthenticatedUsers - Fora da Organização
+```go build```
 
+2. Export vars `GCP_API_KEY` and `PROJECT_ID`
 
-Maximum:
-- 100 ACL each object
+```export GCP_API_KEY=$(gcloud auth print-access-token)```
 
+```export PROJECT_ID="project-id"```
 
-Functions:
-- [x] Get Roles of projects
-- [ ] GetACLs
+# How to use
+```./galc --type Role```
+
+```./galc --type ServiceAccount EMAIL``` 
+
+```./galc --type ServiceAccounts```
+
+Have fun!
+![coffee](https://github.com/tonnytg/galc/img/pix.jpg)

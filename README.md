@@ -22,7 +22,7 @@
 Have fun!<br/>
 But if you liked!
 <br/>
-<a hrf="https://www.paypal.com/invoice/p/#LRG2ZNMKF8T5R6K2">Pay me a Coffe with PayPal</a>
+[Pay me a Coffe with PayPal](https://www.paypal.com/invoice/p/#LRG2ZNMKF8T5R6K2)
 <br/>
 <br/>
 NuBank PIX!!!<br/>

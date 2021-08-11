@@ -13,17 +13,32 @@ import (
 
 func main() {
 
-	menu := "choose:\n\t--type Roles\n\t--type ServiceAccount EMAIL\n\t--type ServiceAccounts\n"
+	key := os.Getenv("GCP_API_KEY")
+	if key == "" {
+		fmt.Println("Invalid GCP_API_KEY, you need export")
+		os.Exit(1)
+	}
+
+	menu := "choose:\n\t--type Roles\t\t\t --project PROJECT_ID\n\t--type ServiceAccount EMAIL\t --project PROJECT_ID\n\t" +
+		"--type ServiceAccounts\t\t --project PROJECT_ID\n"
 
 	f := flag.String("type", "", menu)
+	p := flag.String("project", "", menu)
+	e := flag.String("email", "", menu)
 	flag.Parse()
 
-	switch *f {
-	case "Roles":
+	fmt.Println(*f, *p)
+	if *p == "" || *f == "" {
+		fmt.Println(menu)
+		os.Exit(1)
+	}
+
+	switch {
+	case *f == "Roles":
 		GetRoles()
-	case "ServiceAccount":
+	case *f == "ServiceAccount":
 		GetServiceAccount(os.Args[3])
-	case "ServiceAccounts":
+	case *f == "ServiceAccounts":
 		GetServiceAccounts()
 	default:
 		fmt.Printf(menu)

@@ -17,5 +17,13 @@
 
 ```./galc --type ServiceAccounts```
 
-Have fun!
-![coffee](https://raw.githubusercontent.com/tonnytg/galc/main/img/pix.jpg)
+
+<br/>
+Have fun!<br/>
+But if you liked!
+<br/>
+<a hrf="https://www.paypal.com/invoice/p/#LRG2ZNMKF8T5R6K2">Pay me a Coffe with PayPal</a>
+<br/>
+<br/>
+NuBank PIX!!!<br/>
+<img src="https://raw.githubusercontent.com/tonnytg/galc/main/img/pix.jpg" width="200" height="200">

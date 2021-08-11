@@ -18,4 +18,4 @@
 ```./galc --type ServiceAccounts```
 
 Have fun!
-![coffee](https://github.com/tonnytg/galc/img/pix.jpg)
+![coffee](https://raw.githubusercontent.com/tonnytg/galc/main/img/pix.jpg)
